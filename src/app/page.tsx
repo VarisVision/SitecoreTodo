@@ -15,7 +15,7 @@ import { bindToPageContext, processPageContext } from "@/utils/marketplace";
 import { getModuleInstallationStatus } from "@/utils/moduleInstallation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SetupView from "@/components/SetupView";
-import TalkView from "@/components/TalkView";
+import ToDoView from "@/components/ToDoView";
 import TalkNotConfigured from "@/components/TalkNotConfigured";
 import { SiteInfo } from "@/types";
 
@@ -84,7 +84,7 @@ export default function Home() {
         gap={{ base: 2, sm: 0 }}
       >
         <Heading as="h1" size={{ base: "sm", md: "md" }} textAlign={{ base: "center", sm: "left" }} flex={{ base: "1 1 100%", sm: "0 1 auto" }}>
-          Sitecore Talk
+          To Do List
         </Heading>
         <Box flexShrink={0}>
           <Tooltip label={showSetup ? "Back to Talk" : "Setup & Configuration"}>
@@ -104,7 +104,7 @@ export default function Home() {
       ) : !moduleInstalled ? (
         <TalkNotConfigured />
       ) : (
-        <TalkView SiteInfo={SiteInfo} client={client} />
+        <ToDoView SiteInfo={SiteInfo} client={client} />
       )}
     </Container>
   );

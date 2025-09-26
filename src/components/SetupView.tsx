@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { mdiCommentMultipleOutline } from "@mdi/js";
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
-import { createSitecoreTalkTemplates, getModuleInstallationStatus } from "@/utils/moduleInstallation";
+import { createSitecoreTodoTemplates, getModuleInstallationStatus } from "@/utils/moduleInstallation";
 
 interface SetupViewProps {
   client: ClientSDK | null;
@@ -40,7 +40,7 @@ export default function SetupView({ client }: SetupViewProps) {
     setIsInstallingModule(true);
     try {
       console.log('Installing module...');
-      const status = await createSitecoreTalkTemplates(client);           
+      const status = await createSitecoreTodoTemplates(client);           
       setIsModuleInstalled(status);
     } catch (error) {
       console.error('Error installing module:', error);
@@ -68,14 +68,14 @@ export default function SetupView({ client }: SetupViewProps) {
         >
           <path d={mdiCommentMultipleOutline} />          
         </Icon>                    
-        <Heading size={{ base: "md", md: "lg" }}>Sitecore Talk - Setup</Heading>            
+        <Heading size={{ base: "md", md: "lg" }}>Sitecore Todo - Setup</Heading>            
       </Flex>
 
       {/* Module Installation Section */}
       <Box>
         <Heading size={{ base: "sm", md: "md" }} mb={4}>Module Installation</Heading>
         <Text mb={4} fontSize={{ base: "sm", md: "md" }}>
-          Install the templates for the Sitecore Talk module so it&apos;s ready to use.
+          Install the templates for the Sitecore Todo module so it&apos;s ready to use.
         </Text>
         
         {isModuleInstalled === null ? (

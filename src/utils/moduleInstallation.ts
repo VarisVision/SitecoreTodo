@@ -1,6 +1,6 @@
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
-import { CreateItemResponse, ModuleInstallationStatus } from "@/types";
-import { getContextId, getSitecoreItemState, ModulesPath, ModulesSitecoreTalkDataPath, SitecoreTalkTemplatesPath } from "./client";
+import { CreateItemResponse, ModuleInstallationStatus, SiteInfo } from "@/types";
+import { getContextId, getSitecoreItemState, ModulesPath, ModulesSitecoreTodoDataPath, SitecoreTodoTemplatesPath } from "./client";
 
 
 
@@ -17,11 +17,6 @@ interface CreateTemplateFolderResponse {
     };
 }
 
-export interface SiteInfo {
-    id: string;
-    name: string;
-    path: string;
-}
 
 interface SiteData {
     id?: string | null;
@@ -33,10 +28,10 @@ interface SiteData {
 
 
 async function getModuleFolderState(client: ClientSDK | null): Promise<ModuleInstallationStatus> {
-   return await getSitecoreItemState(client, ModulesSitecoreTalkDataPath);
+   return await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);
 }
 async function getTemplateFolderState(client: ClientSDK | null): Promise<ModuleInstallationStatus> {
-    return await getSitecoreItemState(client, SitecoreTalkTemplatesPath);
+    return await getSitecoreItemState(client, SitecoreTodoTemplatesPath);
 }
 
 export async function getModuleInstallationStatus(client: ClientSDK | null): Promise<ModuleInstallationStatus> {
@@ -55,7 +50,7 @@ export async function getModuleInstallationStatus(client: ClientSDK | null): Pro
     };
 }
 
-export async function createSitecoreTalkTemplates(client: ClientSDK | null): Promise<boolean> {
+export async function createSitecoreTodoTemplates(client: ClientSDK | null): Promise<boolean> {
     const contextId = await getContextId(client);
     if (!contextId) {
         return false;
@@ -65,7 +60,7 @@ export async function createSitecoreTalkTemplates(client: ClientSDK | null): Pro
         const templates = await getTemplateFolderState(client)
         if(templates.isInstalled === false)
         {
-        // Create Sitecore Talk templates folder
+        // Create Sitecore Todo templates folder
             const stFolderResponse = await client?.mutate(
                 "xmc.authoring.graphql",
                 {
@@ -95,12 +90,12 @@ export async function createSitecoreTalkTemplates(client: ClientSDK | null): Pro
             templates.itemId = stFolderResponse?.data?.data?.createItemTemplateFolder?.item?.itemId;
         }
         if (!templates.itemId) {
-            console.error("Failed to create Sitecore Talk templates folder");
+            console.error("Failed to create Sitecore Todo templates folder");
             return false;
         }
          
-            // Create Talk Data template
-            const scTalkResponse = await client?.mutate(
+            // Create Todo Data template
+            const scTodoResponse = await client?.mutate(
                 "xmc.authoring.graphql",
                 {
                     params: {
@@ -136,10 +131,11 @@ export async function createSitecoreTalkTemplates(client: ClientSDK | null): Pro
                 }
             );
 
-            console.log("Created Sitecore Talk templates folder:", templates.itemId, scTalkResponse);          
+            const templateId = (scTodoResponse as any)?.data?.data?.createItemTemplate?.itemTemplate?.templateId;
+            console.log("Created Sitecore Todo templates folder:", templates.itemId, "Template ID:", templateId);          
         
     } catch (error) {
-        console.error("Failed to create Sitecore Talk templates:", error);
+        console.error("Failed to create Sitecore Todo templates:", error);
         return false;
     }
     return await configureSite(client);      
@@ -170,6 +166,7 @@ export async function getSitesInformation(client: ClientSDK | null): Promise<Sit
                     name: siteData.name ?? '',                    
                     path: siteData.properties?.rootPath ?? '',
                     id: siteData.id ?? '',
+                    pageId: siteData.id ?? '',
                 };
             }) ?? []
         );
@@ -196,22 +193,22 @@ export async function configureSite(client: ClientSDK | null): Promise<boolean> 
         }
         console.log("Retrieved system modules folder:", systemModulesFolderState.itemId);
 
-         // Get Sitecore Talk Modules folder
-         const sitecoreTalkModulesFolderState = await getSitecoreItemState(client, ModulesSitecoreTalkDataPath);
+         // Get Sitecore Todo Modules folder
+         const sitecoreTodoModulesFolderState = await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);
      
-        if (!sitecoreTalkModulesFolderState.isInstalled) {
-            console.log(`Creating Sitecore Talk modules folder ${contextId}`);
-            sitecoreTalkModulesFolderState.itemId = await createSitecoreTalkModulesFolder(client, contextId);
+        if (!sitecoreTodoModulesFolderState.isInstalled) {
+            console.log(`Creating Sitecore Todo modules folder ${contextId}`);
+            sitecoreTodoModulesFolderState.itemId = await createSitecoreTodoModulesFolder(client, contextId);
         }
-        console.log("Retrieved System Modules SitecoreTalk folder:", sitecoreTalkModulesFolderState.itemId);
+        console.log("Retrieved System Modules SitecoreTodo folder:", sitecoreTodoModulesFolderState.itemId);
         
-        const sitecoreTalkDataState = await getSitecoreItemState(client, ModulesSitecoreTalkDataPath);
+        const sitecoreTodoDataState = await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);
 
-        if (!sitecoreTalkDataState.isInstalled) {
-            console.error("Failed to get Sitecore Talk template");
+        if (!sitecoreTodoDataState.isInstalled) {
+            console.error("Failed to get Sitecore Todo template");
             return false;
         }
-        console.log("Sitecore Talk template:", sitecoreTalkDataState.itemId);
+        console.log("Sitecore Todo template:", sitecoreTodoDataState.itemId);
         
         return true;
     } catch (error) {
@@ -219,7 +216,7 @@ export async function configureSite(client: ClientSDK | null): Promise<boolean> 
         return false;
     }
 }
-async function createSitecoreTalkModulesFolder(client: ClientSDK | null, contextId: string): Promise<string> {
+async function createSitecoreTodoModulesFolder(client: ClientSDK | null, contextId: string): Promise<string> {
     try {        
         const modulesTodosFolderState = await getSitecoreItemState(client, `/sitecore/system/Modules/TodoData`);
         if(!modulesTodosFolderState.isInstalled){
@@ -255,7 +252,7 @@ async function createSitecoreTalkModulesFolder(client: ClientSDK | null, context
             )as unknown as CreateItemResponse;
             modulesTodosFolderState.itemId = response?.data?.data?.createItem?.item?.itemId;
             if(!modulesTodosFolderState.itemId){
-                console.error("Failed to create SitecoreTalk Module folder")
+                console.error("Failed to create SitecoreTodo Module folder")
                 return "";
             }
         }
@@ -291,7 +288,7 @@ async function createSitecoreTalkModulesFolder(client: ClientSDK | null, context
         return dataFolder?.data?.data?.createItem?.item?.itemId ?? null;
 
     } catch (error) {
-        console.error("Failed to create SitecoreTalk modules folders:", error);
+        console.error("Failed to create SitecoreTodo modules folders:", error);
         return "";
     }
 }

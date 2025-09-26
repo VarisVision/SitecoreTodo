@@ -1,80 +1,12 @@
-import { ClientSDK } from "@sitecore-marketplace-sdk/client";
 
-// API Response Types
-export interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  meta?: {
-    url?: string;
-    days?: number;
-    property?: string;
-    recordCount?: number;
-  };
-}
 
-export interface ApiError {
-  error: string;
-  details?: string;
-}
-
-// Analytics Types
-export interface PageViewsData {
-  date: Date;
-  pageViews: number;
-}
-
+// Core Types
 export interface SiteInfo {
   id: string;
   name: string;
   pageId: string;
   path: string;
 }
-
-// Component Props Types
-export interface AnalyticsChartProps {
-  propertyId: string;
-  route: string;
-  initialDays?: string;
-}
-
-// Google Analytics API Types
-export type MetricType = 'screenPageViews' | 'activeUsers';
-
-// Marketplace SDK Types
-export interface PropertyField {
-  name: string;
-  value: string;
-}
-
-export interface ChildrenResults {
-  results: {
-    id: string;
-    name: string;
-    field: PropertyField;
-  }[];
-}
-
-export interface GqlItem {
-  itemId: string;
-  name: string;
-  children: ChildrenResults;
-}
-
-export interface GqlData {
-  item: GqlItem;
-}
-
-export interface GqlResponse {
-  data: {
-    data: GqlData;
-  };
-}
-
-// Client Context Types
-export interface ClientContext {
-  client: ClientSDK;
-  sitecoreContextId: string;
-} 
 
 export interface ModuleInstallationStatus {
     isInstalled: boolean;
@@ -122,18 +54,6 @@ export interface QueryFieldResponse {
   };
 }
 
-export interface QueryMeResponse {
-    data: {
-        data: {
-            me: {
-                id: string;
-                name: string;
-                email: string;
-            };
-        };
-    };
-}
-
 export interface CreateItemResponse {
     data: {
         data: {
@@ -144,26 +64,27 @@ export interface CreateItemResponse {
     };
 }
 
-// SitecoreTalk Types
-export interface ChatMessage {
-  id: string;
-  author: string;
-  message: string;
-  timestamp: string;
-  avatar?: string;
-}
-
-export interface SitecoreTalkData {
-  itemId: string;
-  name?: string | null;
-  todoData: ChatMessage[];
-}
-
-export interface SitecoreTalkItem {
+// SitecoreTodo Types
+export interface SitecoreTodoItem {
   itemId: string;  
   fields: {
     TodoData: {
       value: string; // JSON string
     };
   };
+}
+
+// Todo Types
+export interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TodoData {
+  itemId: string;
+  name?: string | null;
+  todos: Todo[];
 }
