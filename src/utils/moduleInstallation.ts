@@ -2,8 +2,6 @@ import { ClientSDK } from "@sitecore-marketplace-sdk/client";
 import { CreateItemResponse, ModuleInstallationStatus, SiteInfo } from "@/types";
 import { getContextId, getSitecoreItemState, ModulesPath, ModulesSitecoreTodoDataPath, SitecoreTodoTemplatesPath } from "./client";
 
-
-
 interface CreateTemplateFolderResponse {
     data: {
         data: {
@@ -17,7 +15,6 @@ interface CreateTemplateFolderResponse {
     };
 }
 
-
 interface SiteData {
     id?: string | null;
     name?: string | null;
@@ -25,7 +22,6 @@ interface SiteData {
         rootPath?: string;
     };
 }
-
 
 async function getModuleFolderState(client: ClientSDK | null): Promise<ModuleInstallationStatus> {
    return await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);

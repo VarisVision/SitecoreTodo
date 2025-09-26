@@ -1,5 +1,3 @@
-
-
 // Core Types
 export interface SiteInfo {
   id: string;

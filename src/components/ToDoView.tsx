@@ -27,12 +27,12 @@ import {
   updateSitecoreTodoDataForPage 
 } from "@/utils/client";
 
-interface ToDoViewProps {
+interface TodoViewProps {
   SiteInfo: SiteInfo | undefined;
   client: ClientSDK | null;
 }
 
-export default function ToDoView({ SiteInfo, client }: ToDoViewProps) {
+export default function TodoView({ SiteInfo, client }: TodoViewProps) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoText, setNewTodoText] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);

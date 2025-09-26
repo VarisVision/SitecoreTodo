@@ -15,9 +15,9 @@ import { bindToPageContext, processPageContext } from "@/utils/marketplace";
 import { getModuleInstallationStatus } from "@/utils/moduleInstallation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SetupView from "@/components/SetupView";
-import ToDoView from "@/components/ToDoView";
-import TalkNotConfigured from "@/components/TalkNotConfigured";
+import TodoView from "@/components/TodoView";
 import { SiteInfo } from "@/types";
+import TodoNotConfigured from "@/components/TodoNotConfigured";
 
 export default function Home() {
   const { client, error, isInitialized } = useMarketplaceClient();
@@ -102,9 +102,9 @@ export default function Home() {
       {showSetup ? (
         <SetupView client={client} />
       ) : !moduleInstalled ? (
-        <TalkNotConfigured />
+        <TodoNotConfigured />
       ) : (
-        <ToDoView SiteInfo={SiteInfo} client={client} />
+        <TodoView SiteInfo={SiteInfo} client={client} />
       )}
     </Container>
   );
