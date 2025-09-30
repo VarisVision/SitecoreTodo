@@ -14,6 +14,8 @@ import {
 import { mdiFormatListChecks } from "@mdi/js";
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
 import { createSitecoreTodoTemplates, getModuleInstallationStatus } from "@/utils/moduleInstallation";
+import { createSitecoreTodoDataItem } from "@/utils/client";
+import { processPageContext } from "@/utils/marketplace";
 
 interface SetupViewProps {
   client: ClientSDK | null;
@@ -36,11 +38,28 @@ export default function SetupView({ client }: SetupViewProps) {
     checkModuleStatus();
   }, [client]);
 
+  const createInitialTodoDataItem = async () => {
+    try {
+      const pageContext = await client?.query("pages.context");
+      if (pageContext?.data) {
+        const siteInfo = await processPageContext(pageContext.data);
+        await createSitecoreTodoDataItem(client, siteInfo.pageId, siteInfo.name);
+      }
+    } catch (error) {
+      console.error('Error creating initial TodoData item:', error);
+    }
+  };
+
   const handleInstallModule = async () => {
     setIsInstallingModule(true);
     try {
-      console.log('Installing module...');
-      const status = await createSitecoreTodoTemplates(client);           
+      const status = await createSitecoreTodoTemplates(client);
+      
+      if (status) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await createInitialTodoDataItem();
+      }
+      
       setIsModuleInstalled(status);
     } catch (error) {
       console.error('Error installing module:', error);
@@ -85,7 +104,7 @@ export default function SetupView({ client }: SetupViewProps) {
           </Box>
         ) : isModuleInstalled ? (
           <Text color="green.500" fontWeight="bold" mb={4} fontSize={{ base: "sm", md: "md" }}>
-            ✓ Module is installed, please re-open the module to see the changes.
+            ✓ CoreDo is installed. You can now start adding task!
           </Text>
         ) : (
           <Button 
@@ -105,4 +124,4 @@ export default function SetupView({ client }: SetupViewProps) {
       
     </VStack>
   );
-} 
+}

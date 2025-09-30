@@ -49,15 +49,11 @@ export default function Home() {
     }
   }, [isInitialized, client, error]);
 
-  // Initial data loading on component mount
   useEffect(() => {
     loadMarketplaceData();
   }, [loadMarketplaceData]);
 
-
-  // Reload data when returning from setup view
   useEffect(() => {
-    // Check if we're returning from setup (showSetup changed from true to false)
     if (prevShowSetupRef.current === true && showSetup === false) {
       console.log("Returning from setup, reloading data...");
       loadMarketplaceData();
@@ -69,7 +65,6 @@ export default function Home() {
     setShowSetup(!showSetup);
   }
 
-  // Show loading spinner
   if (loading) {
     return <LoadingSpinner />;
   }

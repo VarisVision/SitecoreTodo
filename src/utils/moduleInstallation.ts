@@ -56,7 +56,6 @@ export async function createSitecoreTodoTemplates(client: ClientSDK | null): Pro
         const templates = await getTemplateFolderState(client)
         if(templates.isInstalled === false)
         {
-        // Create Sitecore Todo templates folder
             const stFolderResponse = await client?.mutate(
                 "xmc.authoring.graphql",
                 {
@@ -86,12 +85,9 @@ export async function createSitecoreTodoTemplates(client: ClientSDK | null): Pro
             templates.itemId = stFolderResponse?.data?.data?.createItemTemplateFolder?.item?.itemId;
         }
         if (!templates.itemId) {
-            console.error("Failed to create Sitecore Todo templates folder");
             return false;
         }
-         
-            // Create Todo Data template
-            const scTodoResponse = await client?.mutate(
+            await client?.mutate(
                 "xmc.authoring.graphql",
                 {
                     params: {
@@ -130,12 +126,7 @@ export async function createSitecoreTodoTemplates(client: ClientSDK | null): Pro
                     }
                 }
             );
-
-            const templateId = (scTodoResponse as any)?.data?.data?.createItemTemplate?.itemTemplate?.templateId;
-            console.log("Created Sitecore Todo templates folder:", templates.itemId, "Template ID:", templateId);          
-        
     } catch (error) {
-        console.error("Failed to create Sitecore Todo templates:", error);
         return false;
     }
     return await configureSite(client);      
@@ -173,9 +164,8 @@ export async function getSitesInformation(client: ClientSDK | null): Promise<Sit
         return siteInfos;
 
     } catch (error) {
-        console.error("Failed to retrieve Sites information:", error);
         return [];
-    }  
+    }
 }
 
 export async function configureSite(client: ClientSDK | null): Promise<boolean> {
@@ -185,34 +175,25 @@ export async function configureSite(client: ClientSDK | null): Promise<boolean> 
     }
 
     try {
-        // Get System Modules folder
         const systemModulesFolderState = await getSitecoreItemState(client, ModulesPath);        
         if (!systemModulesFolderState.isInstalled) {
-            console.error("Failed to get system modules folder");
             return false;
         }
-        console.log("Retrieved system modules folder:", systemModulesFolderState.itemId);
 
-         // Get Sitecore Todo Modules folder
          const sitecoreTodoModulesFolderState = await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);
      
         if (!sitecoreTodoModulesFolderState.isInstalled) {
-            console.log(`Creating Sitecore Todo modules folder ${contextId}`);
             sitecoreTodoModulesFolderState.itemId = await createSitecoreTodoModulesFolder(client, contextId);
         }
-        console.log("Retrieved System Modules SitecoreTodo folder:", sitecoreTodoModulesFolderState.itemId);
         
         const sitecoreTodoDataState = await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);
 
         if (!sitecoreTodoDataState.isInstalled) {
-            console.error("Failed to get Sitecore Todo template");
             return false;
         }
-        console.log("Sitecore Todo template:", sitecoreTodoDataState.itemId);
         
         return true;
     } catch (error) {
-        console.error("Failed to configure site:", error);
         return false;
     }
 }
@@ -252,7 +233,6 @@ async function createSitecoreTodoModulesFolder(client: ClientSDK | null, context
             )as unknown as CreateItemResponse;
             modulesTodosFolderState.itemId = response?.data?.data?.createItem?.item?.itemId;
             if(!modulesTodosFolderState.itemId){
-                console.error("Failed to create SitecoreTodo Module folder")
                 return "";
             }
         }
@@ -288,7 +268,6 @@ async function createSitecoreTodoModulesFolder(client: ClientSDK | null, context
         return dataFolder?.data?.data?.createItem?.item?.itemId ?? null;
 
     } catch (error) {
-        console.error("Failed to create SitecoreTodo modules folders:", error);
         return "";
     }
 }

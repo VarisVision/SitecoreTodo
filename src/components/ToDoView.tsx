@@ -88,22 +88,15 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
 
     setSaving(true);
     try {
-      console.log("Saving todos:", updatedTodos);
-      
       let dataItemId = await getSitecoreTodoDataForPage(client, SiteInfo.id);
-      console.log("Existing data item ID:", dataItemId);
       
       if (!dataItemId || !dataItemId.itemId) {
-        console.log("Creating new data item...");
         dataItemId = await createSitecoreTodoDataItem(client, SiteInfo.id, SiteInfo.name);
-        console.log("Created data item ID:", dataItemId);
       }
 
       if (dataItemId && dataItemId.itemId) {
-        console.log("Updating data item with todos...");
         await updateSitecoreTodoDataForPage(client, SiteInfo.id, updatedTodos);
         setTodos(updatedTodos);
-        console.log("Successfully saved todos");
       } else {
         throw new Error("Failed to get or create data item");
       }

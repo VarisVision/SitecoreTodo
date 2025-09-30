@@ -1,4 +1,3 @@
-// Core Types
 export interface SiteInfo {
   id: string;
   name: string;
@@ -84,17 +83,15 @@ export interface CreateItemResponse {
     };
 }
 
-// SitecoreTodo Types
 export interface SitecoreTodoItem {
   itemId: string;  
   fields: {
     TodoData: {
-      value: string; // JSON string
+      value: string;
     };
   };
 }
 
-// Todo Types
 export interface Todo {
   id: string;
   text: string;
