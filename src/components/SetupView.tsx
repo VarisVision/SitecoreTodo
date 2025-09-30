@@ -11,7 +11,7 @@ import {
   Flex,
   Icon,
 } from "@chakra-ui/react";
-import { mdiCommentMultipleOutline } from "@mdi/js";
+import { mdiFormatListChecks } from "@mdi/js";
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
 import { createSitecoreTodoTemplates, getModuleInstallationStatus } from "@/utils/moduleInstallation";
 
@@ -66,16 +66,16 @@ export default function SetupView({ client }: SetupViewProps) {
         height="50px"
         width="50px"
         >
-          <path d={mdiCommentMultipleOutline} />          
+          <path d={mdiFormatListChecks} />          
         </Icon>                    
-        <Heading size={{ base: "md", md: "lg" }}>Sitecore Todo - Setup</Heading>            
+        <Heading size={{ base: "md", md: "lg" }}>CoreDo - Setup</Heading>            
       </Flex>
 
       {/* Module Installation Section */}
       <Box>
         <Heading size={{ base: "sm", md: "md" }} mb={4}>Module Installation</Heading>
         <Text mb={4} fontSize={{ base: "sm", md: "md" }}>
-          Install the templates for the Sitecore Todo module so it&apos;s ready to use.
+          Install the templates for the CoreDo module so it&apos;s ready to use.
         </Text>
         
         {isModuleInstalled === null ? (
@@ -85,7 +85,7 @@ export default function SetupView({ client }: SetupViewProps) {
           </Box>
         ) : isModuleInstalled ? (
           <Text color="green.500" fontWeight="bold" mb={4} fontSize={{ base: "sm", md: "md" }}>
-            ✓ Module is installed
+            ✓ Module is installed, please re-open the module to see the changes.
           </Text>
         ) : (
           <Button 

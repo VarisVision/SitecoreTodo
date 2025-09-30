@@ -15,7 +15,7 @@ import { bindToPageContext, processPageContext } from "@/utils/marketplace";
 import { getModuleInstallationStatus } from "@/utils/moduleInstallation";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SetupView from "@/components/SetupView";
-import TodoView from "@/components/TodoView";
+import ToDoView from "@/components/ToDoView";
 import { SiteInfo } from "@/types";
 import TodoNotConfigured from "@/components/TodoNotConfigured";
 
@@ -83,9 +83,6 @@ export default function Home() {
         flexWrap={{ base: "wrap", sm: "nowrap" }}
         gap={{ base: 2, sm: 0 }}
       >
-        <Heading as="h1" size={{ base: "sm", md: "md" }} textAlign={{ base: "center", sm: "left" }} flex={{ base: "1 1 100%", sm: "0 1 auto" }}>
-          To Do List
-        </Heading>
         <Box flexShrink={0}>
           <Tooltip label={showSetup ? "Back to Talk" : "Setup & Configuration"}>
             <IconButton
@@ -104,7 +101,7 @@ export default function Home() {
       ) : !moduleInstalled ? (
         <TodoNotConfigured />
       ) : (
-        <TodoView SiteInfo={SiteInfo} client={client} />
+        <ToDoView SiteInfo={SiteInfo} client={client} />
       )}
     </Container>
   );

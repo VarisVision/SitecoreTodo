@@ -109,6 +109,10 @@ export async function createSitecoreTodoTemplates(client: ClientSDK | null): Pro
                                             name: "Data",
                                             fields: [
                                                 {
+                                                    name: "Title",
+                                                    type: "Single-Line Text",
+                                                },
+                                                {
                                                     name: "TodoData",
                                                     type: "Multi-Line Text",
                                                 }                                                  

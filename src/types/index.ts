@@ -4,6 +4,7 @@ export interface SiteInfo {
   name: string;
   pageId: string;
   path: string;
+  title?: string;
 }
 
 export interface ModuleInstallationStatus {
@@ -49,6 +50,27 @@ export interface QueryFieldResponse {
     data: {
       search: QueryFieldData;
     };    
+  };
+}
+
+export interface ItemFieldResult {
+  itemId: string;
+  name: string;
+  path: string;
+  fields: Array<{
+    name: string;
+    value: string;
+  }>;
+  field: {
+    value: string;
+  };
+}
+
+export interface QueryItemFieldResponse {
+  data: {
+    data: {
+      item: ItemFieldResult;
+    };
   };
 }
 

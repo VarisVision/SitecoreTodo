@@ -99,6 +99,74 @@ export async function getSitecoreTodoDataTemplateId(client: ClientSDK | null): P
     }
 }
 
+export async function getTodoDataTitle(client: ClientSDK | null): Promise<string | null> {
+    const contextId = await getContextId(client);
+    if (!contextId) {
+        return null;
+    }
+    
+    try {
+        // Get the Data folder to search for todo items
+        const dataFolderState = await getSitecoreItemState(client, ModulesSitecoreTodoDataPath);
+        if (!dataFolderState.isInstalled || !dataFolderState.itemId) {
+            return null;
+        }
+
+        // Search for todo items in the data folder
+        const response = await client?.mutate(
+            "xmc.preview.graphql",
+            {
+                params: {
+                    query: {
+                        sitecoreContextId: contextId,
+                    },
+                    body: {
+                        query: `query {
+                            search(
+                                where: {
+                                    AND: [
+                                        {
+                                            name: "_path"
+                                            value: "${dataFolderState.itemId}"
+                                        }
+                                    ]
+                                }
+                                first: 1
+                            ) {
+                                total
+                                results {
+                                    id
+                                    field(name: "Title") {
+                                        value
+                                    }
+                                    field(name: "TodoData") {
+                                        jsonValue                                                
+                                    }
+                                }
+                            }
+                        }`
+                    }
+                }
+            }
+        ) as unknown as QueryFieldResponse;
+
+        const todoField = response?.data?.data?.search?.results ?? [];
+        
+        if (todoField?.[0]) {
+            const titleField = todoField[0]?.field;
+            
+            if (titleField?.value && titleField.value.trim()) {
+                return titleField.value;
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error("Failed to fetch todo data title:", error);
+        return null;
+    }
+}
+
 export async function getSitecoreTodoDataForPage(client: ClientSDK | null, _pageItemId: string): Promise<TodoData | null> {
     const contextId = await getContextId(client);
     if (!contextId) {
@@ -216,6 +284,36 @@ export async function createSitecoreTodoDataItem(
             templateId: templateId
         });
 
+        const mutationQuery = `mutation {
+            createItem(
+                input: {
+                    name: "${safeItemName}",
+                    parent: "${dataFolderState.itemId}",
+                    templateId: "${templateId}", 
+                    language: "en",
+                    database: "master",
+                    fields: [
+                        {
+                            name: "Title",
+                            value: "${(pageName || "My Todo List").replace(/"/g, '\\"')}"
+                        },
+                        {
+                            name: "TodoData",
+                            value: "[]"
+                        }
+                    ]
+                }
+            ) {
+                item {
+                    itemId,
+                    name,
+                    path
+                }
+            }
+        }`;
+
+        console.log("GraphQL mutation query:", mutationQuery);
+
         const response = await client?.mutate(
             "xmc.authoring.graphql",
             {
@@ -224,35 +322,20 @@ export async function createSitecoreTodoDataItem(
                         sitecoreContextId: contextId,
                     },
                     body: {
-                        query: `mutation {
-                            createItem(
-                                input: {
-                                    name: "${safeItemName}",
-                                    parent: "${dataFolderState.itemId}",
-                                    templateId: "${templateId}", 
-                                    language: "en",
-                                    database: "master",
-                                    fields: [
-                                        {
-                                            name: "TodoData",
-                                            value: "[]"
-                                        }
-                                    ]
-                                }
-                            ) {
-                                item {
-                                    itemId,
-                                    name,
-                                    path
-                                }
-                            }
-                        }`
+                        query: mutationQuery
                     }
                 }
             }
         ) as unknown as CreateItemResponse;
 
         console.log("Create item response:", response);
+        console.log("Response structure:", {
+            hasData: !!response?.data,
+            hasDataData: !!response?.data?.data,
+            hasCreateItem: !!response?.data?.data?.createItem,
+            hasItem: !!response?.data?.data?.createItem?.item,
+            hasItemId: !!response?.data?.data?.createItem?.item?.itemId
+        });
 
         const itemId = response?.data?.data?.createItem?.item?.itemId;
         

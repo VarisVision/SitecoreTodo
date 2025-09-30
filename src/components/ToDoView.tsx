@@ -24,7 +24,8 @@ import { SiteInfo, Todo } from "@/types";
 import { 
   getSitecoreTodoDataForPage, 
   createSitecoreTodoDataItem, 
-  updateSitecoreTodoDataForPage 
+  updateSitecoreTodoDataForPage,
+  getTodoDataTitle
 } from "@/utils/client";
 
 interface TodoViewProps {
@@ -32,14 +33,30 @@ interface TodoViewProps {
   client: ClientSDK | null;
 }
 
-export default function TodoView({ SiteInfo, client }: TodoViewProps) {
+export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodoText, setNewTodoText] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [pageTitle, setPageTitle] = useState<string>("My Todo List");
   const toast = useToast();
+
+  const loadPageTitle = useCallback(async () => {
+    if (!client || !SiteInfo?.pageId) return;
+
+    try {
+      const title = await getTodoDataTitle(client);
+      if (title) {
+        setPageTitle(title);
+      } else if (SiteInfo.name) {
+        setPageTitle(SiteInfo.name);
+      }
+    } catch (error) {
+      console.error("Failed to load page title:", error);
+    }
+  }, [client, SiteInfo?.pageId, SiteInfo?.name]);
 
   const loadTodos = useCallback(async () => {
     if (!client || !SiteInfo?.id) return;
@@ -106,7 +123,8 @@ export default function TodoView({ SiteInfo, client }: TodoViewProps) {
 
   useEffect(() => {
     loadTodos();
-  }, [loadTodos]);
+    loadPageTitle();
+  }, [loadTodos, loadPageTitle]);
 
   const addTodo = async () => {
     if (!newTodoText.trim()) return;
@@ -188,7 +206,7 @@ export default function TodoView({ SiteInfo, client }: TodoViewProps) {
       <VStack spacing={4} align="stretch">
         <Box>
           <Text fontSize="2xl" fontWeight="bold" mb={2}>
-            My Todo List
+            {pageTitle}
           </Text>
           <Text color="gray.600" fontSize="sm">
             {totalCount > 0 ? `${completedCount} of ${totalCount} completed` : "No todos yet"}
