@@ -1,13 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Container,
-  Heading,
-  Flex,
-  Box,
-  IconButton,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Container, Flex, Box,IconButton,Tooltip } from "@chakra-ui/react";
 import { PagesContext } from "@sitecore-marketplace-sdk/client";
 import { SettingsIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { useMarketplaceClient } from "@/utils/hooks/useMarketplaceClient";

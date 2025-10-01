@@ -27,6 +27,7 @@ import {
   updateSitecoreTodoDataForPage,
   getTodoDataTitle
 } from "@/utils/client";
+import EditableTitle from "./EditableTitle";
 
 interface TodoViewProps {
   SiteInfo: SiteInfo | undefined;
@@ -40,7 +41,7 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
   const [editingText, setEditingText] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [pageTitle, setPageTitle] = useState<string>("My Todo List");
+  const [pageTitle, setPageTitle] = useState<string>("My today's to do");
   const toast = useToast();
 
   const loadPageTitle = useCallback(async () => {
@@ -50,13 +51,13 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
       const title = await getTodoDataTitle(client);
       if (title) {
         setPageTitle(title);
-      } else if (SiteInfo.name) {
-        setPageTitle(SiteInfo.name);
+      } else {
+        setPageTitle("My today's to do");
       }
     } catch (error) {
       console.error("Failed to load page title:", error);
     }
-  }, [client, SiteInfo?.pageId, SiteInfo?.name]);
+  }, [client, SiteInfo?.pageId]);
 
   const loadTodos = useCallback(async () => {
     if (!client || !SiteInfo?.id) return;
@@ -198,9 +199,14 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
     <Box maxW="600px" mx="auto" p={4}>
       <VStack spacing={4} align="stretch">
         <Box>
-          <Text fontSize="2xl" fontWeight="bold" mb={2}>
-            {pageTitle}
-          </Text>
+          {client && SiteInfo?.id && (
+            <EditableTitle
+              title={pageTitle}
+              onTitleChange={setPageTitle}
+              client={client}
+              siteId={SiteInfo.id}
+            />
+          )}
           <Text color="gray.600" fontSize="sm">
             {totalCount > 0 ? `${completedCount} of ${totalCount} completed` : "No todos yet"}
           </Text>
@@ -307,6 +313,7 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
                         <IconButton
                           aria-label="Edit todo"
                           icon={<EditIcon />}
+                          className="edit-icon__fix"
                           onClick={() => startEditing(todo.id, todo.text)}
                           size="sm"
                           variant="ghost"

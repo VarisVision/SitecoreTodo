@@ -275,7 +275,7 @@ export async function createSitecoreTodoDataItem(
                     fields: [
                         {
                             name: "Title",
-                            value: "${(pageName || "My Todo List").replace(/"/g, '\\"')}"
+                            value: "${(pageName || "My today's to do").replace(/"/g, '\\"')}"
                         },
                         {
                             name: "TodoData",
@@ -342,8 +342,8 @@ export async function updateSitecoreTodoDataForPage(
         }
 
         const todoJsonValue = JSON.stringify(todoData)
-            .replace(/\\/g, '\\\\')  // Escape backslashes first
-            .replace(/"/g, '\\"');   // Then escape quotes
+            .replace(/\\/g, '\\\\')
+            .replace(/"/g, '\\"');
 
         await client?.mutate(
             "xmc.authoring.graphql",
@@ -379,6 +379,63 @@ export async function updateSitecoreTodoDataForPage(
         return true;
     } catch (error) {
         console.error("Failed to update SitecoreTodo data for page:", error);
+        return false;
+    }
+}
+
+export async function updateTodoDataTitle(
+    client: ClientSDK | null,
+    pageItemId: string,
+    title: string
+): Promise<boolean> {
+    const contextId = await getContextId(client);
+    if (!contextId) {
+        return false;
+    }
+
+    try {
+        const existingData = await getSitecoreTodoDataForPage(client, pageItemId);
+        if (!existingData?.itemId) {
+            console.error("No existing SitecoreTodo data item found for page:", pageItemId);
+            return false;
+        }
+
+        const escapedTitle = title.replace(/"/g, '\\"');
+
+        await client?.mutate(
+            "xmc.authoring.graphql",
+            {
+                params: {
+                    query: {
+                        sitecoreContextId: contextId,
+                    },
+                    body: {
+                        query: `mutation UpdateTitle {
+                            updateItem(
+                                input: {
+                                    itemId: "${existingData.itemId}",
+                                    fields: [
+                                        {
+                                            name: "Title",
+                                            value: "${escapedTitle}"
+                                        }
+                                    ]
+                                }
+                            ) {
+                                item {
+                                    itemId
+                                    name
+                                }
+                            }
+                        }`
+                    }
+                }
+            }
+        );
+
+        return true;
+    } catch (error) {
+        console.error("Failed to update todo data title:", error);
         return false;
     }
 }

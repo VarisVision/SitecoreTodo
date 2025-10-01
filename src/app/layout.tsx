@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
+import "@/styles/styles.scss";
 
 export const metadata: Metadata = {
   title: "Sitecore XM Cloud - Google Analytics module",
