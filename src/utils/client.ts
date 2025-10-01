@@ -275,7 +275,7 @@ export async function createSitecoreTodoDataItem(
                     fields: [
                         {
                             name: "Title",
-                            value: "${(pageName || "My today's to do").replace(/"/g, '\\"')}"
+                            value: "${("My today's to do").replace(/"/g, '\\"')}"
                         },
                         {
                             name: "TodoData",

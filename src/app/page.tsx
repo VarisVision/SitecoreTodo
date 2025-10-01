@@ -64,25 +64,27 @@ export default function Home() {
 
   return (
     <Container maxW={{ base: "container.sm", md: "container.md", lg: "container.lg" }} py={8} px={{ base: 4, md: 6 }}>
-      <Flex 
-        alignItems="center" 
-        justifyContent="space-between" 
-        py={4}
-        flexWrap={{ base: "wrap", sm: "nowrap" }}
-        gap={{ base: 2, sm: 0 }}
-      >
-        <Box flexShrink={0}>
-          <Tooltip label={showSetup ? "Back to Talk" : "Setup & Configuration"}>
-            <IconButton
-              onClick={handleSettingsClick}
-              icon={showSetup ? <ArrowBackIcon /> : <SettingsIcon />}
-              aria-label={showSetup ? "Back to Talk" : "Setup & Configuration"}
-              variant="ghost"
-              size={{ base: "sm", md: "md" }}
-            />
-          </Tooltip>
-        </Box>
-      </Flex>
+      {moduleInstalled === false && (
+        <Flex 
+          alignItems="center" 
+          justifyContent="space-between" 
+          py={4}
+          flexWrap={{ base: "wrap", sm: "nowrap" }}
+          gap={{ base: 2, sm: 0 }}
+        >
+          <Box flexShrink={0}>
+            <Tooltip label={showSetup ? "Back to CoreDo" : "Setup & Configuration"}>
+              <IconButton
+                onClick={handleSettingsClick}
+                icon={showSetup ? <ArrowBackIcon /> : <SettingsIcon />}
+                aria-label={showSetup ? "Back to CoreDo" : "Setup & Configuration"}
+                variant="ghost"
+                size={{ base: "sm", md: "md" }}
+              />
+            </Tooltip>
+          </Box>
+        </Flex>
+      )}
 
       {showSetup ? (
         <SetupView client={client} />

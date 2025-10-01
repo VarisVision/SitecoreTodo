@@ -207,11 +207,7 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
               siteId={SiteInfo.id}
             />
           )}
-          <Text color="gray.600" fontSize="sm">
-            {totalCount > 0 ? `${completedCount} of ${totalCount} completed` : "No todos yet"}
-          </Text>
         </Box>
-
         <Box>
           <InputGroup>
             <Input
