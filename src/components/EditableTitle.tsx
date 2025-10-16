@@ -123,7 +123,7 @@ export default function EditableTitle({
         icon={<EditIcon />}
         onClick={startEditing}
         className="edit-icon__fix"
-        size="sm"
+        size="xs"
         variant="ghost"
         opacity={0}
         _groupHover={{ opacity: 1 }}
