@@ -9,7 +9,9 @@ export const SitecoreTodoDataTemplateName = "TodoData";
 export async function getContextId(client: ClientSDK | null): Promise<string | null> {
     try {
         const application = await client?.query("application.context");
+        console.log("application: " + application);
         const sitecoreContextId = application?.data?.resources?.[0]?.context?.preview;
+        console.log("sitecore context id:" + sitecoreContextId);
         
         if (!sitecoreContextId) {
             throw new Error("Failed to get sitecore context ID");

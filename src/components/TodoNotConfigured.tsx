@@ -13,9 +13,9 @@ export default function TodoNotConfigured() {
       <Alert status="warning" borderRadius="md">
         <AlertIcon />
         <Box>
-          <AlertTitle>CoreDo Module Not Configured!</AlertTitle>
+          <AlertTitle>Page To Do Module Not Configured!</AlertTitle>
           <AlertDescription>
-            The CoreDo module hasn&apos;t been set up for this site. Please click the settings icon (⚙️) above to install the module and ensure it is configured for this site.
+            The Page To Do module hasn&apos;t been set up for this site. Please click the settings icon (⚙️) above to install the module and ensure it is configured for this site.
           </AlertDescription>
         </Box>
       </Alert>

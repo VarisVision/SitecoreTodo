@@ -87,14 +87,14 @@ export default function SetupView({ client }: SetupViewProps) {
         >
           <path d={mdiFormatListChecks} />          
         </Icon>                    
-        <Heading size={{ base: "md", md: "lg" }}>CoreDo - Setup</Heading>            
+        <Heading size={{ base: "md", md: "lg" }}>Page To Do - Setup</Heading>            
       </Flex>
 
       {/* Module Installation Section */}
       <Box>
         <Heading size={{ base: "sm", md: "md" }} mb={4}>Module Installation</Heading>
         <Text mb={4} fontSize={{ base: "sm", md: "md" }}>
-          Install the templates for the CoreDo module so it&apos;s ready to use.
+          Install the templates for the Page To Do module so it&apos;s ready to use.
         </Text>
         
         {isModuleInstalled === null ? (
@@ -104,7 +104,7 @@ export default function SetupView({ client }: SetupViewProps) {
           </Box>
         ) : isModuleInstalled ? (
           <Text color="green.500" fontWeight="bold" mb={4} fontSize={{ base: "sm", md: "md" }}>
-            ✓ CoreDo is installed. You can now start adding task!
+            ✓ Page To Do is installed. You can now start adding task!
           </Text>
         ) : (
           <Button 
