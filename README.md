@@ -37,42 +37,10 @@ Check the [Sitecore Marketplace](https://marketplace.sitecore.com) for the lates
 
 This project uses the [Sitecore Marketplace SDK](https://www.npmjs.com/package/@sitecore-marketplace-sdk/client) for integration with Sitecore XM Cloud.
 
-# Build and Test
-
-## Building the Project
-
-To build the project for production:
-
-```bash
-npm run build
-```
-
 ## Running in Development Mode
 
 To run the project in development mode with hot reload:
 
 ```bash
 npm run dev
-```
-
-## Type Checking
-
-To check TypeScript types without building:
-
-```bash
-npm run type-check
-```
-
-## Linting
-
-To check code quality:
-
-```bash
-npm run lint
-```
-
-To automatically fix linting issues:
-
-```bash
-npm run lint:fix
 ```

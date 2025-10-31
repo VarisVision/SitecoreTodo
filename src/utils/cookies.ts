@@ -48,11 +48,11 @@ export function listAllLocalStorage(): Record<string, string> {
     return {};
   }
   
-  const items: Record<string, string> = {};
+    const items: Record<string, string> = {};
   for (let i = 0; i < window.localStorage.length; i++) {
     const key = window.localStorage.key(i);
     if (key) {
-      items[key] = window.localStorage.getItem(key) || '';
+      items[key] = window.localStorage.getItem(key) ?? '';
     }
   }
   return items;

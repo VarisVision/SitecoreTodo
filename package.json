@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "build:analyze": "ANALYZE=true npm run build",
-    "clean": "rm -rf .next out"
+    "clean": "rimraf .next out || rm -rf .next out"
   },
   "dependencies": {
     "@chakra-ui/cli": "^2.5.8",

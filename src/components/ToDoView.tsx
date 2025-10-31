@@ -22,14 +22,6 @@ import { AddIcon, DeleteIcon, EditIcon, CheckIcon, CloseIcon } from "@chakra-ui/
 import Icon from "@mdi/react";
 import { mdiDrag } from "@mdi/js";
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
-import { SiteInfo, Todo } from "@/types";
-import { 
-  getSitecoreTodoDataForPage, 
-  createSitecoreTodoDataItem, 
-  updateSitecoreTodoDataForPage,
-  getTodoDataTitle
-} from "@/utils/client";
-import EditableTitle from "./EditableTitle";
 import {
   DndContext,
   closestCenter,
@@ -47,6 +39,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { SiteInfo, Todo } from "@/types";
+import { 
+  getSitecoreTodoDataForPage, 
+  createSitecoreTodoDataItem, 
+  updateSitecoreTodoDataForPage,
+  getTodoDataTitle
+} from "@/utils/client";
+import EditableTitle from "./EditableTitle";
 
 interface TodoViewProps {
   SiteInfo: SiteInfo | undefined;
@@ -225,7 +225,7 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
 
     setLoading(true);
     try {
-      const todoData = await getSitecoreTodoDataForPage(client, SiteInfo.id);
+      const todoData = await getSitecoreTodoDataForPage(client);
       if (todoData?.todos) {
         setTodos(todoData.todos);
       } else {
@@ -250,13 +250,13 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
 
     setSaving(true);
     try {
-      let dataItemId = await getSitecoreTodoDataForPage(client, SiteInfo.id);
+      let dataItemId = await getSitecoreTodoDataForPage(client);
       
-      if (!dataItemId || !dataItemId.itemId) {
+      if (!dataItemId?.itemId) {
         dataItemId = await createSitecoreTodoDataItem(client, SiteInfo.id, SiteInfo.name);
       }
 
-      if (dataItemId && dataItemId.itemId) {
+      if (dataItemId?.itemId) {
         await updateSitecoreTodoDataForPage(client, SiteInfo.id, updatedTodos);
         setTodos(updatedTodos);
       } else {

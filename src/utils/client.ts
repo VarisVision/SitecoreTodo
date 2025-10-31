@@ -9,9 +9,9 @@ export const SitecoreTodoDataTemplateName = "TodoData";
 export async function getContextId(client: ClientSDK | null): Promise<string | null> {
     try {
         const application = await client?.query("application.context");
-        console.log("application: " + application);
+        console.log(`application: ${application}`);
         const sitecoreContextId = application?.data?.resources?.[0]?.context?.preview;
-        console.log("sitecore context id:" + sitecoreContextId);
+        console.log(`sitecore context id:${sitecoreContextId}`);
         
         if (!sitecoreContextId) {
             throw new Error("Failed to get sitecore context ID");
@@ -153,7 +153,7 @@ export async function getTodoDataTitle(client: ClientSDK | null): Promise<string
         if (todoField?.[0]) {
             const titleField = todoField[0]?.field;
             
-            if (titleField?.value && titleField.value.trim()) {
+            if (titleField?.value?.trim()) {
                 return titleField.value;
             }
         }
@@ -165,7 +165,7 @@ export async function getTodoDataTitle(client: ClientSDK | null): Promise<string
     }
 }
 
-export async function getSitecoreTodoDataForPage(client: ClientSDK | null, _pageItemId: string): Promise<TodoData | null> {
+export async function getSitecoreTodoDataForPage(client: ClientSDK | null): Promise<TodoData | null> {
     const contextId = await getContextId(client);
     if (!contextId) {
         return null;
@@ -226,7 +226,7 @@ export async function getSitecoreTodoDataForPage(client: ClientSDK | null, _page
         
         return {
             itemId: todoField?.[0]?.id ?? '',
-            todos: todoData || []
+            todos: todoData ?? []
         };
     } catch (error) {
         console.error("Failed to fetch Todo data for page:", error);
@@ -246,8 +246,8 @@ export async function createSitecoreTodoDataItem(
     }
 
     try {
-        const existingData = await getSitecoreTodoDataForPage(client, pageItemId);
-        if (existingData && existingData.itemId) {
+        const existingData = await getSitecoreTodoDataForPage(client);
+        if (existingData?.itemId) {
             return existingData;
         }
 
@@ -312,7 +312,7 @@ export async function createSitecoreTodoDataItem(
         
         if (itemId) {
             return {
-                itemId: itemId,
+                itemId,
                 todos: []
             };
         } else {
@@ -337,7 +337,7 @@ export async function updateSitecoreTodoDataForPage(
     }
 
     try {
-        const existingData = await getSitecoreTodoDataForPage(client, pageItemId);
+        const existingData = await getSitecoreTodoDataForPage(client);
         if (!existingData?.itemId) {
             console.error("No existing SitecoreTodo data item found for page:", pageItemId);
             return false;
@@ -396,7 +396,7 @@ export async function updateTodoDataTitle(
     }
 
     try {
-        const existingData = await getSitecoreTodoDataForPage(client, pageItemId);
+        const existingData = await getSitecoreTodoDataForPage(client);
         if (!existingData?.itemId) {
             console.error("No existing SitecoreTodo data item found for page:", pageItemId);
             return false;

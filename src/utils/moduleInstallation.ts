@@ -126,7 +126,7 @@ export async function createSitecoreTodoTemplates(client: ClientSDK | null): Pro
                     }
                 }
             );
-    } catch (error) {
+    } catch {
         return false;
     }
     return await configureSite(client);      
@@ -163,7 +163,7 @@ export async function getSitesInformation(client: ClientSDK | null): Promise<Sit
         );
         return siteInfos;
 
-    } catch (error) {
+    } catch {
         return [];
     }
 }
@@ -193,7 +193,7 @@ export async function configureSite(client: ClientSDK | null): Promise<boolean> 
         }
         
         return true;
-    } catch (error) {
+    } catch {
         return false;
     }
 }
@@ -267,7 +267,7 @@ async function createSitecoreTodoModulesFolder(client: ClientSDK | null, context
         )as unknown as CreateItemResponse;
         return dataFolder?.data?.data?.createItem?.item?.itemId ?? null;
 
-    } catch (error) {
+    } catch {
         return "";
     }
 }
