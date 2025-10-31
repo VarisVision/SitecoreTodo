@@ -12,10 +12,7 @@ import {
 import Icon from '@mdi/react';
 import { mdiDotsHorizontal, mdiHelpCircleOutline, mdiInformationOutline } from '@mdi/js';
 
-interface FloatingMenuProps {
-}
-
-export default function FloatingMenu({}: FloatingMenuProps) {
+export default function FloatingMenu() {
   const currentYear = new Date().getFullYear();
 
   return (    
