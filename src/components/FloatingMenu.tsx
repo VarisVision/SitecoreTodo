@@ -9,16 +9,30 @@ import {
   Link,
   Image
 } from "@chakra-ui/react";
-import { SettingsIcon } from "@chakra-ui/icons";
+import Icon from '@mdi/react';
+import { mdiDotsHorizontal, mdiHelpCircleOutline, mdiInformationOutline } from '@mdi/js';
 
 interface FloatingMenuProps {
-  showSetup: boolean;
-  onSettingsClick: () => void;
 }
 
-export default function FloatingMenu({ showSetup, onSettingsClick }: FloatingMenuProps) {
-  return (
-    <Box className="floating-menu-bar">
+export default function FloatingMenu({}: FloatingMenuProps) {
+  const currentYear = new Date().getFullYear();
+
+  return (    
+    <Box
+      position="fixed"
+      top={0}
+      left={0}
+      right={0}
+      height="38px"
+      backgroundColor="#E9E9E9"
+      zIndex={1001}
+      display="flex"
+      alignItems="center"
+      justifyContent="flex-end"
+      paddingRight="8px"
+      className="floating-menu-bar"
+    >
       <Menu>
         <MenuButton
           as={IconButton}
@@ -31,67 +45,62 @@ export default function FloatingMenu({ showSetup, onSettingsClick }: FloatingMen
           minHeight="18px"
           height="18px"
           width="20px"            
-          fontSize="8px"
+          fontSize="12px"
           className="menu-dots-button"
           fontWeight="bold"
         >
-          ⋮
+          <Icon path={mdiDotsHorizontal} size={1} />
         </MenuButton>
-        <MenuList fontSize="sm" minWidth="160px" textAlign="right">
-          <MenuItem 
-            onClick={onSettingsClick} 
-            justifyContent="flex-end"
-            textAlign="right"
-            sx={{
-              "& .chakra-menu__icon": {
-                transition: "transform 0.3s ease",
-              },
-              "&:hover .chakra-menu__icon": {
-                transform: "rotate(180deg)",
-              }
-            }}
-            icon={<SettingsIcon/>}
-          >
-            {showSetup ? "Page To Do" : "Setup & Configuration"}
-          </MenuItem>
-          <MenuItem 
-            as={Link}
-            href="https://example.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            justifyContent="right"
-          >
-            Help
-          </MenuItem>
-          <MenuItem 
-            as={Link}
-            href="https://example.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            justifyContent="right"
-          >
-            About
-          </MenuItem>
-          <MenuItem 
-            cursor="default"
-            _hover={{ bg: "transparent" }}
-            _focus={{ bg: "transparent" }}
+        <MenuList fontSize="sm" minWidth="160px" textAlign="left" p={0}>
+          {/* Menu Items */}
+          <Box>
+            <MenuItem 
+              as={Link}
+              href="https://example.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              justifyContent="flex-start"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+              icon={<Icon path={mdiHelpCircleOutline} size={1} />}
+            >
+              Help
+            </MenuItem>
+            <MenuItem 
+              as={Link}
+              href="https://example.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              justifyContent="flex-start"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+              icon={<Icon path={mdiInformationOutline} size={1} />}
+            >
+              About
+            </MenuItem>
+          </Box>
+
+          {/* Footer with PING logo */}
+          <Box
+            backgroundColor="#E9E9E9"
+            borderTop="1px solid #E0E0E0"
+            py="2px"
+            px={2}
             display="flex"
-            justifyContent="left"
+            justifyContent="flex-end"
             alignItems="center"
-            py={2}
           >
             <Image
               src="/ping-logo.png"
               alt="PING Logo"
-              height="13px"
+              height="15px"
               width="auto"
               maxHeight="20px"
               objectFit="contain"
               opacity={0.7}
             />
-            <Box fontSize="11px" ml={1}>© 2025</Box>
-          </MenuItem>
+            <Box fontSize="11px" ml={1} color="gray.600">© {currentYear}</Box>
+          </Box>
         </MenuList>
       </Menu>
     </Box>

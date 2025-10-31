@@ -1,8 +1,7 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Container, Flex, Box,IconButton,Tooltip } from "@chakra-ui/react";
+import { useState, useEffect, useCallback } from "react";
+import { Container, Flex } from "@chakra-ui/react";
 import { PagesContext } from "@sitecore-marketplace-sdk/client";
-import { SettingsIcon, ArrowBackIcon } from "@chakra-ui/icons";
 import { useMarketplaceClient } from "@/utils/hooks/useMarketplaceClient";
 import { bindToPageContext, processPageContext } from "@/utils/marketplace";
 import { getModuleInstallationStatus } from "@/utils/moduleInstallation";
@@ -10,16 +9,13 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import SetupView from "@/components/SetupView";
 import ToDoView from "@/components/ToDoView";
 import { SiteInfo } from "@/types";
-import TodoNotConfigured from "@/components/TodoNotConfigured";
+import FloatingMenu from "@/components/FloatingMenu";
 
 export default function Home() {
   const { client, error, isInitialized } = useMarketplaceClient();
   const [loading, setLoading] = useState(true);
   const [SiteInfo, setSiteInfo] = useState<SiteInfo>();
-  const [showSetup, setShowSetup] = useState(false);
   const [moduleInstalled, setModuleInstalled] = useState<boolean | null>(null);
-
-  const prevShowSetupRef = useRef<boolean>(false);
 
   const loadMarketplaceData = useCallback(async () => {
     async function handlePageContextChange(res: PagesContext) {
@@ -46,24 +42,16 @@ export default function Home() {
     loadMarketplaceData();
   }, [loadMarketplaceData]);
 
-  useEffect(() => {
-    if (prevShowSetupRef.current === true && showSetup === false) {
-      console.log("Returning from setup, reloading data...");
-      loadMarketplaceData();
-    }
-    prevShowSetupRef.current = showSetup;
-  }, [showSetup, loadMarketplaceData]);
 
-  const handleSettingsClick = () => {
-    setShowSetup(!showSetup);
-  }
 
   if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <Container maxW={{ base: "container.sm", md: "container.md", lg: "container.lg" }} py={8} px={{ base: 4, md: 6 }}>
+    <>
+      <FloatingMenu />
+      <Container maxW={{ base: "container.sm", md: "container.md", lg: "container.lg" }} py={8} px={{ base: 4, md: 6 }}>
       {moduleInstalled === false && (
         <Flex 
           alignItems="center" 
@@ -72,27 +60,15 @@ export default function Home() {
           flexWrap={{ base: "wrap", sm: "nowrap" }}
           gap={{ base: 2, sm: 0 }}
         >
-          <Box flexShrink={0}>
-            <Tooltip label={showSetup ? "Back to Page To Do" : "Setup & Configuration"}>
-              <IconButton
-                onClick={handleSettingsClick}
-                icon={showSetup ? <ArrowBackIcon /> : <SettingsIcon />}
-                aria-label={showSetup ? "Back to Page To Do" : "Setup & Configuration"}
-                variant="ghost"
-                size={{ base: "sm", md: "md" }}
-              />
-            </Tooltip>
-          </Box>
         </Flex>
       )}
 
-      {showSetup ? (
-        <SetupView client={client} />
-      ) : !moduleInstalled ? (
-        <TodoNotConfigured />
+      {!moduleInstalled ? (
+        <SetupView client={client} onInstallationComplete={loadMarketplaceData} />
       ) : (
         <ToDoView SiteInfo={SiteInfo} client={client} />
       )}
     </Container>
+    </>
   );
 }

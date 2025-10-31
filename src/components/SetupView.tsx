@@ -10,6 +10,8 @@ import {
   Divider,
   Flex,
   Icon,
+  Alert,
+  AlertIcon,
 } from "@chakra-ui/react";
 import { mdiFormatListChecks } from "@mdi/js";
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
@@ -19,9 +21,10 @@ import { processPageContext } from "@/utils/marketplace";
 
 interface SetupViewProps {
   client: ClientSDK | null;
+  onInstallationComplete?: () => void;
 }
 
-export default function SetupView({ client }: SetupViewProps) {
+export default function SetupView({ client, onInstallationComplete }: SetupViewProps) {
   const [isModuleInstalled, setIsModuleInstalled] = useState<boolean | null>(null);
   const [isInstallingModule, setIsInstallingModule] = useState<boolean>(false);
   
@@ -61,6 +64,9 @@ export default function SetupView({ client }: SetupViewProps) {
       }
       
       setIsModuleInstalled(status);
+      if (status && onInstallationComplete) {
+        onInstallationComplete();
+      }
     } catch (error) {
       console.error('Error installing module:', error);
       alert('Failed to install module. Please try again.');
@@ -69,7 +75,12 @@ export default function SetupView({ client }: SetupViewProps) {
     }
   };
 
-   
+  const handleStartApp = () => {
+    if (onInstallationComplete) {
+      onInstallationComplete();
+    }
+  };
+
   return (
     <VStack spacing={8} align="stretch">
       <Flex 
@@ -90,22 +101,45 @@ export default function SetupView({ client }: SetupViewProps) {
         <Heading size={{ base: "md", md: "lg" }}>Page To Do - Setup</Heading>            
       </Flex>
 
-      {/* Module Installation Section */}
+      {isModuleInstalled === false && (
+        <Box>
+          <Heading size={{ base: "sm", md: "md" }} mb={2}>Welcome to Page To Do plugin!</Heading>
+          <Text mb={8} fontSize={{ base: "sm", md: "md" }} color="gray.600">
+            Track tasks via checklist for page builder pages. Get started by installing the module below.
+          </Text>
+          <Alert status="info" borderRadius="md">
+            <AlertIcon />
+            <Box>
+              <Text fontSize={{ base: "sm", md: "md" }} fontWeight="bold" mb={1}>
+                Module Not Installed
+              </Text>
+              <Text fontSize={{ base: "xs", md: "sm" }}>
+                The Page To Do module needs to be installed before you can start using it. Click the &quot;Install Module&quot; button below to set up the required templates and data folders.
+              </Text>
+            </Box>
+          </Alert>
+        </Box>
+      )}
+
       <Box>
-        <Heading size={{ base: "sm", md: "md" }} mb={4}>Module Installation</Heading>
-        <Text mb={4} fontSize={{ base: "sm", md: "md" }}>
-          Install the templates for the Page To Do module so it&apos;s ready to use.
-        </Text>
-        
         {isModuleInstalled === null ? (
           <Box mb={4} display="flex" alignItems="center">
             <Spinner size="sm" mr={2} />
             <Text fontSize={{ base: "sm", md: "md" }}>Checking module status...</Text>
           </Box>
         ) : isModuleInstalled ? (
-          <Text color="green.500" fontWeight="bold" mb={4} fontSize={{ base: "sm", md: "md" }}>
-            ✓ Page To Do is installed. You can now start adding task!
-          </Text>
+          <Box mb={4}>
+            <Text color="green.500" fontWeight="bold" mb={4} fontSize={{ base: "sm", md: "md" }}>
+              ✓ Page To Do is installed. You can now start adding task!
+            </Text>
+            <Button 
+              colorScheme="green" 
+              onClick={handleStartApp} 
+              size={{ base: "sm", md: "md" }}
+            >
+              Start App
+            </Button>
+          </Box>
         ) : (
           <Button 
             colorScheme="blue" 

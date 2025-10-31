@@ -38,7 +38,7 @@ export async function getModuleInstallationStatus(client: ClientSDK | null): Pro
         return invalidSiteInfo;
     }
 
-    const response = await getTemplateFolderState(client)
+    const response = await getTemplateFolderState(client);
 
     const datafolder = await getModuleFolderState(client)
     return {
