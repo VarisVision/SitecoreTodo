@@ -19,6 +19,8 @@ import {
   InputRightElement,
 } from "@chakra-ui/react";
 import { AddIcon, DeleteIcon, EditIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons";
+import Icon from "@mdi/react";
+import { mdiDrag } from "@mdi/js";
 import { ClientSDK } from "@sitecore-marketplace-sdk/client";
 import { SiteInfo, Todo } from "@/types";
 import { 
@@ -28,10 +30,162 @@ import {
   getTodoDataTitle
 } from "@/utils/client";
 import EditableTitle from "./EditableTitle";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface TodoViewProps {
   SiteInfo: SiteInfo | undefined;
   client: ClientSDK | null;
+}
+
+interface SortableTodoItemProps {
+  todo: Todo;
+  editingId: string | null;
+  editingText: string;
+  onToggle: (id: string) => void;
+  onStartEditing: (id: string, text: string) => void;
+  onCancelEditing: () => void;
+  onSaveEdit: () => void;
+  onDelete: (id: string) => void;
+  onEditingTextChange: (text: string) => void;
+  onKeyPress: (e: React.KeyboardEvent) => void;
+}
+
+function SortableTodoItem({
+  todo,
+  editingId,
+  editingText,
+  onToggle,
+  onStartEditing,
+  onCancelEditing,
+  onSaveEdit,
+  onDelete,
+  onEditingTextChange,
+  onKeyPress,
+}: SortableTodoItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: todo.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
+  return (
+    <Box
+      ref={setNodeRef}
+      style={style}
+      p={3}
+      border="1px"
+      borderColor="gray.200"
+      borderRadius="md"
+      bg={todo.completed ? "gray.50" : "white"}
+      opacity={todo.completed ? 0.7 : 1}
+    >
+      <HStack spacing={3}>
+        <Box
+          {...attributes}
+          {...listeners}
+          cursor="grab"
+          _active={{ cursor: "grabbing" }}
+          display="flex"
+          alignItems="center"
+          mr="-5px"
+        >
+          <Icon path={mdiDrag} size={1} color="#666" />
+        </Box>
+        <Checkbox
+          isChecked={todo.completed}
+          onChange={() => onToggle(todo.id)}
+          colorScheme="blue"
+          size="lg"
+        />
+        
+        {editingId === todo.id ? (
+          <Input
+            value={editingText}
+            onChange={(e) => onEditingTextChange(e.target.value)}
+            onKeyPress={onKeyPress}
+            autoFocus
+            size="sm"
+          />
+        ) : (
+          <Text
+            flex={1}
+            textDecoration={todo.completed ? "line-through" : "none"}
+            color={todo.completed ? "gray.500" : "black"}
+            fontSize="md"
+          >
+            {todo.text}
+          </Text>
+        )}
+
+        <HStack spacing={1}>
+          {editingId === todo.id ? (
+            <>
+              <IconButton
+                aria-label="Save edit"
+                icon={<CheckIcon />}
+                onClick={onSaveEdit}
+                size="sm"
+                colorScheme="green"
+                variant="ghost"
+              />
+              <IconButton
+                aria-label="Cancel edit"
+                icon={<CloseIcon />}
+                onClick={onCancelEditing}
+                size="sm"
+                colorScheme="red"
+                variant="ghost"
+              />
+            </>
+          ) : (
+            <>
+              <IconButton
+                aria-label="Edit todo"
+                icon={<EditIcon />}
+                className="edit-icon__fix"
+                onClick={() => onStartEditing(todo.id, todo.text)}
+                size="sm"
+                variant="ghost"
+              />
+              <IconButton
+                aria-label="Delete todo"
+                icon={<DeleteIcon />}
+                onClick={() => onDelete(todo.id)}
+                size="sm"
+                colorScheme="red"
+                variant="ghost"
+              />
+            </>
+          )}
+        </HStack>
+      </HStack>
+    </Box>
+  );
 }
 
 export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
@@ -43,6 +197,13 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
   const [saving, setSaving] = useState(false);
   const [pageTitle, setPageTitle] = useState<string>("My today's to do");
   const toast = useToast();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const loadPageTitle = useCallback(async () => {
     if (!client || !SiteInfo?.pageId) return;
@@ -184,6 +345,18 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = todos.findIndex((item) => item.id === active.id);
+      const newIndex = todos.findIndex((item) => item.id === over.id);
+      const updatedTodos = arrayMove(todos, oldIndex, newIndex);
+      setTodos(updatedTodos);
+      await saveTodos(updatedTodos);
+    }
+  };
+
   const completedCount = todos.filter(todo => todo.completed).length;
   const totalCount = todos.length;
 
@@ -247,87 +420,32 @@ export default function ToDoView({ SiteInfo, client }: TodoViewProps) {
               </Text>
             </Center>
           ) : (
-            todos.map((todo) => (
-              <Box
-                key={todo.id}
-                p={3}
-                border="1px"
-                borderColor="gray.200"
-                borderRadius="md"
-                bg={todo.completed ? "gray.50" : "white"}
-                opacity={todo.completed ? 0.7 : 1}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={todos}
+                strategy={verticalListSortingStrategy}
               >
-                <HStack spacing={3}>
-                  <Checkbox
-                    isChecked={todo.completed}
-                    onChange={() => toggleTodo(todo.id)}
-                    colorScheme="blue"
-                    size="lg"
+                {todos.map((todo) => (
+                  <SortableTodoItem
+                    key={todo.id}
+                    todo={todo}
+                    editingId={editingId}
+                    editingText={editingText}
+                    onToggle={toggleTodo}
+                    onStartEditing={startEditing}
+                    onCancelEditing={cancelEditing}
+                    onSaveEdit={saveEdit}
+                    onDelete={deleteTodo}
+                    onEditingTextChange={setEditingText}
+                    onKeyPress={handleKeyPress}
                   />
-                  
-                  {editingId === todo.id ? (
-                    <Input
-                      value={editingText}
-                      onChange={(e) => setEditingText(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      autoFocus
-                      size="sm"
-                    />
-                  ) : (
-                    <Text
-                      flex={1}
-                      textDecoration={todo.completed ? "line-through" : "none"}
-                      color={todo.completed ? "gray.500" : "black"}
-                      fontSize="md"
-                    >
-                      {todo.text}
-                    </Text>
-                  )}
-
-                  <HStack spacing={1}>
-                    {editingId === todo.id ? (
-                      <>
-                        <IconButton
-                          aria-label="Save edit"
-                          icon={<CheckIcon />}
-                          onClick={saveEdit}
-                          size="sm"
-                          colorScheme="green"
-                          variant="ghost"
-                        />
-                        <IconButton
-                          aria-label="Cancel edit"
-                          icon={<CloseIcon />}
-                          onClick={cancelEditing}
-                          size="sm"
-                          colorScheme="red"
-                          variant="ghost"
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <IconButton
-                          aria-label="Edit todo"
-                          icon={<EditIcon />}
-                          className="edit-icon__fix"
-                          onClick={() => startEditing(todo.id, todo.text)}
-                          size="sm"
-                          variant="ghost"
-                        />
-                        <IconButton
-                          aria-label="Delete todo"
-                          icon={<DeleteIcon />}
-                          onClick={() => deleteTodo(todo.id)}
-                          size="sm"
-                          colorScheme="red"
-                          variant="ghost"
-                        />
-                      </>
-                    )}
-                  </HStack>
-                </HStack>
-              </Box>
-            ))
+                ))}
+              </SortableContext>
+            </DndContext>
           )}
         </VStack>
 
