@@ -53,7 +53,7 @@ export default function FloatingMenu() {
           <Box>
             <MenuItem 
               as={Link}
-              href="https://example.com"
+              href="https://www.ping-works.com.au/services/sitecore-xm-cloud-plugins/to-do"
               target="_blank"
               rel="noopener noreferrer"
               justifyContent="flex-start"
@@ -65,7 +65,7 @@ export default function FloatingMenu() {
             </MenuItem>
             <MenuItem 
               as={Link}
-              href="https://example.com"
+              href="https://www.ping-works.com.au/services/sitecore-xm-cloud-plugins"
               target="_blank"
               rel="noopener noreferrer"
               justifyContent="flex-start"
